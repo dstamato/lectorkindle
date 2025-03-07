@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Libros - Kindle Clippings</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; background-color: #f8f9fa; }
+        h2 { color: #333; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; padding: 20px; }
+        .book-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: left; }
+        .book-card a { text-decoration: none; font-size: 16px; color: #007BFF; font-weight: bold; display: block; }
+        .book-card a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📖 Lista de Libros con Resaltados</h2>
+        <p>Total de libros: <strong>{{ total_libros }}</strong></p>
+
+        <form id="formSubir" enctype="multipart/form-data">
+            <input type="file" id="archivo" name="archivo" accept=".txt">
+            <button type="submit">📂 Subir archivo</button>
+        </form>
+        <p id="mensajeSubida" style="color: green;"></p>
+
+        <div class="grid-container">
+            {% for libro in libros %}
+                <div class="book-card">
+                    <a href="/libro/{{ libro.id }}">{{ libro.titulo }}</a>
+                    <p>✍️ Autor: {{ libro.autor }}</p>
+                    <p>🔢 Subrayados: {{ libro.subrayados }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("formSubir").addEventListener("submit", async function(event) {
+            event.preventDefault();
+            let formData = new FormData();
+            let archivo = document.getElementById("archivo").files[0];
+            if (!archivo) { alert("Selecciona un archivo antes de subirlo."); return; }
+            formData.append("archivo", archivo);
+            let response = await fetch("/subir", { method: "POST", body: formData });
+            let data = await response.json();
+            document.getElementById("mensajeSubida").textContent = data.mensaje || data.error;
+        });
+    </script>
+</body>
+</html>
